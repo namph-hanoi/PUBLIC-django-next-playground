@@ -1,0 +1,67 @@
+services:
+  # frontend:
+  #   container_name: frontend
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./nextjs:/app
+  #   environment:
+  #     - NODE_ENV=development
+
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: development
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/code
+    env_file:
+      - ./.env
+    ports:
+      - 8000:8000
+    depends_on:
+      - redis
+      - database
+
+  database:
+    container_name: database
+    build:
+      context: ./database
+    volumes:
+      - ./database/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./database/postgresql.conf:/etc/postgresql/postgresql.conf
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=${DB_NAME:-postgres}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: redis
+    image: redis:7
+    ports:
+        - "6380:6379" # Exposing Redis on different port for convenience
+    command: [
+      "bash", "-c",
+      '
+       docker-entrypoint.sh
+       --requirepass password
+      '
+    ]
+    restart: always
+
+volumes:
+  pgdata:
+  entrypoint.sh:
