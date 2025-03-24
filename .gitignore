@@ -26,6 +26,8 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+node_modules/
+.next/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -129,5 +131,6 @@ staticfiles/
 
 */wheelhouse
 *.sql
-.devtools
+.devtools/
+devtools/
 .DS_Store

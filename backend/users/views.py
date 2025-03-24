@@ -2,6 +2,7 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import RegisterView, SocialLoginView
 from dj_rest_auth.views import LoginView
+from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from rest_framework import permissions, status
@@ -17,6 +18,7 @@ from users.models import Address, PhoneNumber, Profile
 from users.permissions import IsUserAddressOwner, IsUserProfileOwner
 from users.serializers import (
     AddressReadOnlySerializer,
+    CustomTokenRefreshSerializer,
     PhoneNumberSerializer,
     ProfileSerializer,
     UserLoginSerializer,
@@ -24,6 +26,8 @@ from users.serializers import (
     UserSerializer,
     VerifyPhoneNumberSerialzier,
 )
+from django.conf import settings
+
 
 User = get_user_model()
 
@@ -165,3 +169,26 @@ class AddressViewSet(ReadOnlyModelViewSet):
         res = super().get_queryset()
         user = self.request.user
         return res.filter(user=user)
+    
+class CustomTokenRefreshView(TokenRefreshView):
+
+    serializer_class = CustomTokenRefreshSerializer
+    
+    def post(self, request, *args, **kwargs):
+        response = super().post(
+            request, 
+            *args, **kwargs,
+        )
+        
+        if response.status_code == status.HTTP_200_OK and 'refresh' in response.data:
+            cookie_max_age = settings.JWT_AUTH_COOKIE_MAX_AGE
+            response.set_cookie(
+            settings.JWT_AUTH_REFRESH_COOKIE,
+            response.data['refresh'],
+            max_age=cookie_max_age,
+            httponly=True,
+            samesite=settings.JWT_AUTH_COOKIE_SAMESITE,
+            secure=settings.JWT_AUTH_COOKIE_SECURE
+            )
+            
+        return response

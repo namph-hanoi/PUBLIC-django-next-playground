@@ -6,6 +6,8 @@ from django_countries.serializers import CountryFieldMixin
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+
 
 from .exceptions import (
     AccountDisabledException,
@@ -265,3 +267,27 @@ class BillingAddressSerializer(CountryFieldMixin, serializers.ModelSerializer):
         representation["address_type"] = "B"
 
         return representation
+
+class CustomTokenRefreshSerializer(TokenRefreshSerializer):
+    """
+    Custom Token Refresh Serializer that validates using cookies
+    """
+    token = serializers.CharField(required=False)
+    
+    def validate(self, attrs):
+        request = self.context['request']
+        
+        # Check for token in request data
+        token = attrs.get('token')
+        if not token:
+            raise serializers.ValidationError(_("Missing data token."))
+        # If token not in request data, check cookie
+        refresh_token = request.COOKIES.get(settings.JWT_AUTH_REFRESH_COOKIE)
+            
+        if not refresh_token:
+            raise serializers.ValidationError(_('No valid refresh token found.'))
+            
+        # Add the token back to the validated data
+        attrs['refresh'] = refresh_token
+        super().validate(self, attrs)
+        return attrs

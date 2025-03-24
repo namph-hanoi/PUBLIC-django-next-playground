@@ -9,7 +9,10 @@ from .views import (
     UserLoginAPIView,
     UserRegisterationAPIView,
     VerifyPhoneNumberAPIView,
+    CustomTokenRefreshView,
 )
+from rest_framework_simplejwt.views import TokenRefreshView
+
 
 app_name = "users"
 
@@ -19,6 +22,8 @@ router.register(r"", AddressViewSet)
 urlpatterns = [
     path("register/", UserRegisterationAPIView.as_view(), name="user_register"),
     path("login/", UserLoginAPIView.as_view(), name="user_login"),
+    path("refresh-token/", TokenRefreshView.as_view(), name="user_login"),
+    path("custom-refresh/", CustomTokenRefreshView.as_view(), name="user_login"),
     path("send-sms/", SendOrResendSMSAPIView.as_view(), name="send_resend_sms"),
     path(
         "verify-phone/", VerifyPhoneNumberAPIView.as_view(), name="verify_phone_number"
