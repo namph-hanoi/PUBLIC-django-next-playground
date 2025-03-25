@@ -5,9 +5,9 @@ from rest_framework import status
 from django.urls import reverse
 from django.core import mail
 
-from devtools.debug import chill
 from tests.factories import UserFactory
 from allauth.account.models import EmailAddress
+from django.contrib.auth import get_user_model
 
 
 @pytest.mark.integration
@@ -84,7 +84,6 @@ class TestUserAPI:
 
         assert confirm_response.status_code == status.HTTP_200_OK
 
-        from django.contrib.auth import get_user_model
 
         User = get_user_model()
 
@@ -106,3 +105,16 @@ class TestUserAPI:
         
         assert register_response.status_code == status.HTTP_400_BAD_REQUEST
         assert "password is too common" in str(register_response.data).lower()
+
+    @pytest.mark.django_db
+    def test_user_creation_batch(self):
+        users = UserFactory.create_batch(3)
+        
+        User = get_user_model()
+        db_users = User.objects.all()
+        
+        assert len(users) == 3
+        assert db_users.count() >= 3
+        
+        for user in users:
+            assert User.objects.filter(id=user.id).exists()

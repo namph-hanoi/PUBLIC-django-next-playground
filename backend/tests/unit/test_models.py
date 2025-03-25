@@ -9,7 +9,7 @@ User = get_user_model()
 @pytest.mark.unit
 class TestUserModel:
     """Test the User model."""
-    
+    @pytest.mark.django_db
     def test_create_user(self):
         """Test creating a user is successful."""
         username = 'testuser'
@@ -25,7 +25,8 @@ class TestUserModel:
         assert user.email == email
         assert user.check_password(password)
         assert not user.is_staff
-        
+    
+    @pytest.mark.django_db
     def test_create_superuser(self):
         """Test creating a superuser."""
         user = User.objects.create_superuser(
@@ -36,7 +37,8 @@ class TestUserModel:
         
         assert user.is_superuser
         assert user.is_staff
-        
+    
+    @pytest.mark.django_db    
     def test_user_factory(self):
         """Test the UserFactory."""
         user = UserFactory()
@@ -44,5 +46,3 @@ class TestUserModel:
         assert User.objects.filter(pk=user.pk).exists()
         assert user.username.startswith('user_')
         assert '@example.com' in user.email
-
-# Add more unit tests for your models here
