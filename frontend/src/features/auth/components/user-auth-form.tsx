@@ -19,7 +19,8 @@ import * as z from 'zod';
 import GithubSignInButton from './github-auth-button';
 
 const formSchema = z.object({
-  email: z.string().email({ message: 'Enter a valid email address' })
+  email: z.string().email({ message: 'Enter a valid email address' }),
+  password: z.string().min(8, { message: 'Password is required' })
 });
 
 type UserFormValue = z.infer<typeof formSchema>;
@@ -29,7 +30,8 @@ export default function UserAuthForm() {
   const callbackUrl = searchParams.get('callbackUrl');
   const [loading, startTransition] = useTransition();
   const defaultValues = {
-    email: 'demo@gmail.com'
+    email: 'demo@gmail.com',
+    password: '',
   };
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
@@ -38,10 +40,35 @@ export default function UserAuthForm() {
 
   const onSubmit = async (data: UserFormValue) => {
     startTransition(() => {
-      signIn('credentials', {
-        email: data.email,
-        callbackUrl: callbackUrl ?? '/dashboard'
+      fetch('/api/internal/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      })
+      .then(response => {
+        // debugger;
+        if (!response.ok) {
+          throw new Error('Login failed');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Handle successful login
+        toast.success('Signed In Successfully!');
+        window.location.href = callbackUrl ?? '/dashboard';
+      })
+      .catch(error => {
+        toast.error('Failed to sign in: ' + error.message);
       });
+      // signIn('credentials', {
+      //   email: data.email,
+      //   callbackUrl: callbackUrl ?? '/dashboard'
+      // });
       toast.success('Signed In Successfully!');
     });
   };
@@ -63,6 +90,24 @@ export default function UserAuthForm() {
                   <Input
                     type='email'
                     placeholder='Enter your email...'
+                    disabled={loading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='password'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    type='password'
+                    placeholder='Enter your password...'
                     disabled={loading}
                     {...field}
                   />

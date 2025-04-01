@@ -18,6 +18,7 @@
       "@/*": ["./src/*"],
       "~/*": ["./public/*"]
     },
+    "sourceMap": true,
     "incremental": true,
     "plugins": [
       {
@@ -27,5 +28,5 @@
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"],
-  "moduleResolution": ["node_modules", ".next", "node"]
+  // "moduleResolution": ["node_modules", ".next", "node"]
 }

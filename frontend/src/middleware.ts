@@ -1,17 +1,15 @@
-// Protecting routes with next-auth
-// https://next-auth.js.org/configuration/nextjs#middleware
-// https://nextjs.org/docs/app/building-your-application/routing/middleware
+import { NextResponse } from "next/server";
 
-import NextAuth from 'next-auth';
-import authConfig from '@/lib/auth.config';
+export async function middleware(request: Request) {
+  console.log(`Middleware accessed: ${request.url}`);
+  const response = NextResponse.next();
+  response.headers.set('x-middleware-cache', 'no-cache');
+  
+  // TODO: Check for access and refresh token for protected routes
 
-const { auth } = NextAuth(authConfig);
+  return response;
+}
 
-export default auth((req) => {
-  if (!req.auth) {
-    const url = req.url.replace(req.nextUrl.pathname, '/');
-    return Response.redirect(url);
-  }
-});
-
-export const config = { matcher: ['/dashboard/:path*'] };
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+}
