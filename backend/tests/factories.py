@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from factory.django import DjangoModelFactory
 from products.models import Product, ProductCategory
 import random
+from allauth.account.models import EmailAddress
 
 User = get_user_model()
 
@@ -21,6 +22,15 @@ class UserFactory(DjangoModelFactory):
         self.set_password(password)
         if create:
             self.save()
+            
+class EmailAddressFactory(DjangoModelFactory):
+    class Meta:
+        model = EmailAddress
+    
+    email = factory.LazyAttribute(lambda o: f"email_{random.randint(1, 1000)}@example.com")
+    user = factory.SubFactory(UserFactory)
+    verified = True
+    primary = True
 
 
 class ProductCategoryFactory(DjangoModelFactory):

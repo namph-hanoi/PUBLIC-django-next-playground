@@ -4,11 +4,15 @@ services:
   #   build:
   #     context: ./frontend
   #     dockerfile: Dockerfile
+  #     target: development
+  #   volumes:
+  #     - ./frontend:/app
+  #     - node_modules:/app/node_modules
   #   ports:
   #     - "3000:3000"
-  #   volumes:
-  #     - ./nextjs:/app
   #   environment:
+  #     - AUTH_GITHUB_ID=${AUTH_GITHUB_ID:-}
+  #     - AUTH_GITHUB_SECRET=${AUTH_GITHUB_SECRET:-}
   #     - NODE_ENV=development
 
   backend:
@@ -22,6 +26,8 @@ services:
       - ./backend:/code
     env_file:
       - ./.env
+    environment:
+      - SERVICE=backend
     ports:
       - 8000:8000
     depends_on:
@@ -65,3 +71,4 @@ services:
 volumes:
   pgdata:
   entrypoint.sh:
+  node_modules:
