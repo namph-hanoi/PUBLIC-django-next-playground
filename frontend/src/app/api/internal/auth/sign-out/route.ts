@@ -1,11 +1,9 @@
-import { catchErrorTyped as getResponseText } from '@/lib/catchErrorTyped';
 import { NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(_request: Request) {
   try {
     // Create a response that will clear the refresh_token cookie
     const response = NextResponse.json({ success: true });
-
     response.cookies.set('refresh_token', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

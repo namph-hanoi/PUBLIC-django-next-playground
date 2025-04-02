@@ -11,7 +11,7 @@ export default async function Page() {
 
   try {
     const response = await fetch(
-      'https://api.github.com/repos/kiranism/next-shadcn-dashboard-starter',
+      'https://github.com/namph-hanoi',
       {
         next: { revalidate: 3600 }
       }

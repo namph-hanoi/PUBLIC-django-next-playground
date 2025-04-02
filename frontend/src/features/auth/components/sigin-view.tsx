@@ -62,7 +62,7 @@ export default function SignInViewPage({ stars }: { stars: number }) {
               'group inline-flex hover:text-yellow-200'
             )}
             target='_blank'
-            href={'https://github.com/kiranism/next-shadcn-dashboard-starter'}
+            href={'https://github.com/namph-hanoi'}
           >
             <div className='flex items-center'>
               <GitHubLogoIcon className='size-4' />
