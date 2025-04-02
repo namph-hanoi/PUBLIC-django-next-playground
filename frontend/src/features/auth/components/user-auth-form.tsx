@@ -11,12 +11,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
-import { useSearchParams } from 'next/navigation';
+import { redirect, useSearchParams } from 'next/navigation';
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import GithubSignInButton from './github-auth-button';
+import { catchErrorTyped as getResponse } from '@/lib/catchErrorTyped';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
@@ -39,8 +40,8 @@ export default function UserAuthForm() {
   });
 
   const onSubmit = async (data: UserFormValue) => {
-    startTransition(() => {
-      fetch('/api/internal/auth', {
+    startTransition(async () => {
+      const getAuthTokens = await fetch('/api/internal/auth/sign-in', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,26 +51,15 @@ export default function UserAuthForm() {
           password: data.password,
         }),
       })
-      .then(response => {
-        // debugger;
-        if (!response.ok) {
-          throw new Error('Login failed');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Handle successful login
+      const [_, response] = await getResponse(getAuthTokens.json())
+      if (response.error) {
+        toast.error(response.error.detail);
+      } else {
         toast.success('Signed In Successfully!');
-        window.location.href = callbackUrl ?? '/dashboard';
-      })
-      .catch(error => {
-        toast.error('Failed to sign in: ' + error.message);
-      });
-      // signIn('credentials', {
-      //   email: data.email,
-      //   callbackUrl: callbackUrl ?? '/dashboard'
-      // });
-      toast.success('Signed In Successfully!');
+        redirect('/dashboard')
+      }
+      // TODO:
+      //   window.location.href = callbackUrl ?? '/dashboard';
     });
   };
 

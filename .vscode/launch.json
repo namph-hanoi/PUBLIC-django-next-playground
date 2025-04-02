@@ -6,7 +6,11 @@
       "type": "node",
       "request": "attach",
       "skipFiles": ["<node_internals>/**"],
-      "port": 9230
+      "port": 9230,
+      "localRoot": "${workspaceFolder}/frontend",
+      "remoteRoot": "/app/frontend",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/frontend/.next/**/*.js"]
     },
   ]
 }
