@@ -10,8 +10,10 @@ from .views import (
     UserRegisterationAPIView,
     VerifyPhoneNumberAPIView,
     CustomTokenRefreshView,
+    TokenRefreshView,
 )
-from rest_framework_simplejwt.views import TokenRefreshView
+# from rest_framework_simplejwt.views import TokenRefreshView
+
 
 
 app_name = "users"
