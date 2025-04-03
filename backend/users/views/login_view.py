@@ -1,8 +1,7 @@
-from rest_framework_simplejwt.views import TokenRefreshView as TokenRefreshJWT
 from decouple import config
+from . import UserLoginAPIView
 
-
-class TokenRefreshView(TokenRefreshJWT):
+class LoginViewCustom(UserLoginAPIView):
 
     def post(self, request, *args, **kwargs):
         response = super().post(
@@ -10,8 +9,8 @@ class TokenRefreshView(TokenRefreshJWT):
             *args,
             **kwargs,
         )
-        access_token = response.data.get('access')
-        refresh_token = response.data.get('refresh')
+        access_token = response.data.get('access_token')
+        refresh_token = response.data.get('refresh_token')
         response.data = {
             config("NEXT_PUBLIC_ACCESS_TOKEN_KEY", default="ACCESS_TOKEN"): access_token,
             config("NEXT_PUBLIC_REFRESH_TOKEN_KEY", default="REFRESH_TOKEN"): refresh_token,

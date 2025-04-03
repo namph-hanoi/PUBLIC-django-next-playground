@@ -3,7 +3,6 @@ import pytest
 from rest_framework import status
 from django.urls import reverse
 
-from devtools.debug import chill
 from tests.factories import EmailAddressFactory, UserFactory
 from django.contrib.auth import get_user_model
 from allauth.account.models import EmailAddress

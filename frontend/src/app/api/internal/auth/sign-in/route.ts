@@ -1,9 +1,10 @@
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '@/constants/settings';
+import { NEXT_PUBLIC_ACCESS_TOKEN_KEY, NEXT_PUBLIC_REFRESH_TOKEN_KEY } from '@/constants/settings';
 import { catchErrorTyped as getResponseText } from '@/lib/catchErrorTyped';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
+
     const { email, password } = await request.json();
 
     if (!email || !password) {
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
     }
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/user/login/`,
+      `${process.env.NEXT_PUBLIC_REST_URL || 'http://localhost:8000'}/api/user/login/`,
       {
         method: 'POST',
         headers: {
@@ -27,15 +28,16 @@ export async function POST(request: Request) {
     const [_error, text] = await getResponseText(response.json());
 
     if (!response.ok) {
+      console.log(["🚀 ~ POST ~ response:", response])
       return NextResponse.json(
-        { error: text || 'Authentication failed' },
+        { error: text || { detail: 'Authentication failed' } },
         { status: response.status }
       );
     }
-    
+
     let responseObj;
 
-    const refreshToken = text[REFRESH_TOKEN_KEY];
+    const refreshToken = text[NEXT_PUBLIC_REFRESH_TOKEN_KEY];
     if (!refreshToken) {
       responseObj = new NextResponse(
         JSON.stringify({
@@ -50,11 +52,10 @@ export async function POST(request: Request) {
           }
         }
       );
-  
     } else {
       responseObj = new NextResponse(
         JSON.stringify({
-          [ACCESS_TOKEN_KEY]: text[ACCESS_TOKEN_KEY]
+          [NEXT_PUBLIC_ACCESS_TOKEN_KEY]: text[NEXT_PUBLIC_ACCESS_TOKEN_KEY]
         }),
         {
           status: 200,
@@ -63,10 +64,10 @@ export async function POST(request: Request) {
           }
         }
       );
-  
+
       responseObj.cookies.set({
-        name: REFRESH_TOKEN_KEY,
-        value: text[REFRESH_TOKEN_KEY],
+        name: NEXT_PUBLIC_REFRESH_TOKEN_KEY,
+        value: text[NEXT_PUBLIC_REFRESH_TOKEN_KEY],
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
@@ -76,13 +77,11 @@ export async function POST(request: Request) {
       });
     }
 
-
-
     return responseObj;
   } catch (error) {
     console.error('Authentication error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error:  { detail: 'Internal server error' }},
       { status: 500 }
     );
   }

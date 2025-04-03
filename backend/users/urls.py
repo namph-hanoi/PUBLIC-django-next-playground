@@ -6,7 +6,7 @@ from .views import (
     ProfileAPIView,
     SendOrResendSMSAPIView,
     UserAPIView,
-    UserLoginAPIView,
+    LoginViewCustom,
     UserRegisterationAPIView,
     VerifyPhoneNumberAPIView,
     CustomTokenRefreshView,
@@ -23,7 +23,7 @@ router.register(r"", AddressViewSet)
 
 urlpatterns = [
     path("register/", UserRegisterationAPIView.as_view(), name="user_register"),
-    path("login/", UserLoginAPIView.as_view(), name="user_login"),
+    path("login/", LoginViewCustom.as_view(), name="user_login"),
     path("refresh-token/", TokenRefreshView.as_view(), name="refresh_token"),
     path("custom-refresh/", CustomTokenRefreshView.as_view(), name="custom_refresh_token"),
     path("send-sms/", SendOrResendSMSAPIView.as_view(), name="send_resend_sms"),
