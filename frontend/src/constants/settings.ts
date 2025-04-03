@@ -1,0 +1,3 @@
+// TODO: put them all to AWS Secrets
+export const ACCESS_TOKEN_KEY = process.env.ACCESS_TOKEN_KEY || 'ACCESS_TOKEN_KEY'
+export const REFRESH_TOKEN_KEY = process.env.REFRESH_TOKEN_KEY || 'REFRESH_TOKEN_KEY'

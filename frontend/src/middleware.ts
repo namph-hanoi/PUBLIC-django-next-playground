@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { REFRESH_TOKEN_KEY } from "./constants/settings";
 
 const protectedRoutes = ["/dashboard", "/dashboard", "/logout"];
 
@@ -8,7 +9,7 @@ export async function middleware(request: Request) {
   const isProtectedRoute = protectedRoutes.some(route => url.pathname.startsWith(route));
 
   const cookies = request.headers.get('cookie') || '';
-  const hasRefreshToken = cookies.includes('refresh_token=');
+  const hasRefreshToken = cookies.includes(`${REFRESH_TOKEN_KEY}=`);
 
   if (isProtectedRoute && !hasRefreshToken) {
     return NextResponse.redirect(new URL("/", request.url));
